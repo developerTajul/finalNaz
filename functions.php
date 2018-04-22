@@ -1214,16 +1214,53 @@ if (isset($_GET['delete'])) {
 add_shortcode('comet_exam_survey', 'comet_exam_survey_func');
 
 function comet_exam_survey_func($atts, $content) {
+    global $wpdb;
    // add_action('init', 'start_session', 1);
     /**
      *
-     * all questions/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     * all $_SESSION["current_mcq_no"]questions/////////////////////////////////////////////////////////////////////////////////////////////////////////////
      */
     if(session_id() == ''){
      session_start(); 
     }
+
+    /**
+    *
+    * checking the exam condition here
+    * 
+    */
+    $exam_table = $wpdb->prefix . "mcq_results";
+    $current_user_id = get_current_user_id();
+    $exam_data = $wpdb->get_results("SELECT * FROM wp_mcq_results WHERE user_id='$current_user_id' ORDER BY result_id DESC");
+    $count_exam = count($exam_data);
+
+
+    if($count_exam > 1){
+        if ($exam_data[0]->marks_obtained > 90) {
+            echo "You have passed the exam and you got ".$exam_data[0]->marks_obtained;
+        }else{
+            echo "Sorry you failed and unable to perform exam you got ".$exam_data[0]->marks_obtained;
+        }
+       exit();
+    }elseif($count_exam = 1){
+            if ($exam_data[0]->marks_obtained > 90) {
+                echo "You have passed the exam and you got ".$exam_data[0]->marks_obtained;
+                exit();
+            }else{
+                
+            }
+        }else{
+            
+        }
+
+     
     
-    global $wpdb;
+    /**
+    *
+    * end of checking the exam condition here
+    * 
+    */
+    
     $questions_table = $wpdb->prefix . "mcq_question";
     $_SESSION['quiz'] = $wpdb->get_results("SELECT * FROM $questions_table");
     $quiz_count = count($_SESSION['quiz']);
@@ -1281,13 +1318,26 @@ function comet_exam_survey_func($atts, $content) {
         * inserting data to database by tajujl
         *
         */
-           $total_marks =  $_SESSION["answers"];
+  
+        $total_marks =  $_SESSION["answers"];
 
            $q ="INSERT INTO wp_mcq_results(user_id, exam_date, marks_obtained) VALUES('$user_id', CURRENT_TIMESTAMP, '$total_marks')";
 
            $all_data = $wpdb->query($q);
+
+        
+
            if( isset($total_marks) ){
-                 echo "You got ".$total_marks." Marks out 100";
+                if($total_marks >= 90){
+                    echo "You got $total_marks out of 100. You have passed the exam ";
+                }elseif ($total_marks < 90) { 
+                    if($cout_exam < 2){
+                        echo "You got $total_marks and you can retake the exam again ";
+                        echo ' <a href="http://corlate.lh/shortcode-test/">Exam Again</a>';
+                    }else{
+                        echo "You got $total_marks out of 100. You have failed";
+                    }
+                }
            }
 
             
@@ -1302,7 +1352,7 @@ function comet_exam_survey_func($atts, $content) {
     }
 } else {
     unset($_SESSION["answers"]);
-    $current_mcq_no = $_SESSION["current_mcq_no"]=0;
+    $current_mcq_no = $_SESSION["current_mcq_no"] = 0;
     $current_mcq = $_SESSION["quiz"][$current_mcq_no];
     $_SESSION["current_mcq_no"] = $current_mcq_no + 1;
     echo '<pre>';
