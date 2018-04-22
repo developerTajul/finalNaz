@@ -1231,7 +1231,7 @@ function comet_exam_survey_func($atts, $content) {
     */
     $exam_table = $wpdb->prefix . "mcq_results";
     $current_user_id = get_current_user_id();
-    $exam_data = $wpdb->get_results("SELECT * FROM wp_mcq_results WHERE user_id='$current_user_id' ORDER BY result_id DESC");
+    $exam_data = $wpdb->get_results("SELECT * FROM $exam_table WHERE user_id='$current_user_id' ORDER BY result_id DESC");
     $count_exam = count($exam_data);
 
 
@@ -1250,7 +1250,7 @@ function comet_exam_survey_func($atts, $content) {
                 
             }
         }else{
-            
+
         }
 
      
@@ -1355,33 +1355,28 @@ function comet_exam_survey_func($atts, $content) {
     $current_mcq_no = $_SESSION["current_mcq_no"] = 0;
     $current_mcq = $_SESSION["quiz"][$current_mcq_no];
     $_SESSION["current_mcq_no"] = $current_mcq_no + 1;
-    echo '<pre>';
+    
    // var_dump($current_mcq);
 }
 //var_dump($_SESSION["answers"]);
 
-var_dump($_SESSION["current_mcq_no"]);
+// var_dump($_SESSION["current_mcq_no"]);
     ?>
 
     <form action="" method="post">
-        <table>
-            <tr>
-                <td><label for="sUsername"><?php echo $current_mcq->question_text; ?></label></td>
 
-                <!-- nested loop for options -->
-                <td><input type="radio" name="answer" value="1"><?php echo $current_mcq->answer1; ?></td>
-                <td><input type="radio" name="answer" value="2"><?php echo $current_mcq->answer2; ?></td>
-                <td><input type="radio" name="answer" value="3"><?php echo $current_mcq->answer3; ?></td>
-                <td><input type="radio" name="answer" value="4"><?php echo $current_mcq->answer4; ?></td>
+        <p>
+            <label for=""><?php echo $current_mcq->question_text; ?></label>
+                <input type="radio" name="answer" value="1"><?php echo $current_mcq->answer1; ?><br />
+               <input type="radio" name="answer" value="2"><?php echo $current_mcq->answer2; ?><br />
+               <input type="radio" name="answer" value="3"><?php echo $current_mcq->answer3; ?><br />
+               <input type="radio" name="answer" value="4"><?php echo $current_mcq->answer4; ?>
 
-                <!-- nested loop ends here -->
-            </tr>			
-
-            <tr>
-                <td></td>
-                <td><input type="submit" value="Submit" name="survey_info"></td>
-            </tr>
-        </table>			
+        </p>
+        <p>
+            <input type="submit" value="Submit" name="survey_info">
+        </p>
+			
     </form>
     <?php
     return ob_get_clean();
@@ -1431,3 +1426,20 @@ function start_quiz($atts, $content) {
     <?php
     return ob_get_clean();
 }
+
+
+
+/***
+*
+*
+* Plugin Decoration
+*
+*
+*
+*/
+
+
+/**
+ * Register a custom menu page.
+ */
+
